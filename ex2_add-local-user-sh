@@ -1,0 +1,51 @@
+#!/bin/bash
+
+# Verificar si el usuario tiene privilegios de root
+if [[ "${UID}" -ne 0 ]]
+then
+    echo "You don't have root privileges..."
+    exit 1
+fi
+
+# Ingresar nombre de usuario
+read -p "Enter the username to create: " USER_NAME
+
+# Ingresar comentario de la cuenta (propiedad string del nuevo usuario)
+read -p "Enter the name of the person who this account is for: " COMMENT
+
+# Creación del nuevo usuario
+useradd -c "${COMMENT}" -m ${USER_NAME}
+
+# Check for return of previous command
+if [[ "${?}" -ne 0 ]]
+then
+    echo "Failed useradd execution"
+    exit
+fi
+
+# Ask for the password.
+read -p "Enter the password to use for the account: " PASSWORD
+
+# Asignar contraseña al nombre de usuario indicado
+echo ${PASSWORD} | passwd --stdin ${USER_NAME}
+
+# Verificar que el cambio de contraseña fue exitoso
+if [[ "${?}" -ne 0 ]]
+then
+  echo "Failed setting the password"
+  exit 1
+fi
+
+# Forzar a que el usuario cambie su contraseña cuando ingrese
+passwd -e ${USER_NAME}
+
+echo "
+username:
+${USER_NAME}
+
+password:
+${PASSWORD}
+
+host:
+$(hostname)"
+
