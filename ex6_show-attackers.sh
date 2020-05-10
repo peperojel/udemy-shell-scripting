@@ -20,18 +20,18 @@ then
     exit 1
 fi
 
-# Display the CSV header
+# Display the CSV header.
 echo "Count,IP,Location"
 
-# Aggregates the relevant information in the log file
+# Aggregates the relevant information in the log file.
 ATTEMPTS=$(grep Failed syslog-sample | awk '{print $(NF - 3)}' | sort | uniq -c | sort -nr)
 
 echo "${ATTEMPTS}" | while read -r COUNT IP
 do
-    # If the number of failed attempts is greater than LIMIT display count, IP, and location
+    # If the number of failed attempts is greater than LIMIT display count, IP, and location.
     if [[ "${COUNT}" -gt "${LIMIT}" ]]
     then
-        # Looking up the location of the attacker
+        # Looking up the location of the attacker.
         FROM=$(geoiplookup ${IP} | awk -F ', ' '{print $NF}')
         echo "${COUNT},${IP},${FROM}"
     fi
